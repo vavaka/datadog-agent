@@ -726,8 +726,8 @@ static PyObject *obfuscate_sql_exec_plan(PyObject *self, PyObject *args, PyObjec
 
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    char *rawPlan;
-    PyObject *normalizeObj;
+    char *rawPlan = NULL;
+    PyObject *normalizeObj = NULL;
     static char *kwlist[] = {"", "normalize", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|O", kwlist, &rawPlan, &normalizeObj)) {
         PyGILState_Release(gstate);
