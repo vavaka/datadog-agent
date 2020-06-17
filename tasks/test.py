@@ -464,7 +464,7 @@ def lint_python(ctx):
 
     ctx.run("flake8 .")
 
-    
+
 @task
 def install_shellcheck(ctx, version="0.7.0", destination="/usr/local/bin"):
     """
