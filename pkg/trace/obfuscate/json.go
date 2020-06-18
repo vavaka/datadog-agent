@@ -158,7 +158,7 @@ func (p *jsonObfuscator) obfuscate(data []byte) (string, error) {
 				p.keeping = true
 				p.keepDepth = depth + 1
 			} else if !p.transformingValue && p.transformer != nil && p.transformKeys[k] {
-				// the string value immediately following this key will be passed through sql string obfuscation
+				// the string value immediately following this key will be passed through the value transformer
 				// if anything other than a literal is found then sql obfuscation is stopped and json obfuscation
 				// proceeds as usual
 				p.transformingValue = true
