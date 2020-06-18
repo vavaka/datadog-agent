@@ -25,7 +25,7 @@ def build(ctx, race=False, go_version=None, incremental_build=False,
     """
     Build the security agent
     """
-    ldflags, gcflags, env = get_build_flags(ctx, arch=arch, major_version=major_version, python_runtimes='3')
+    ldflags, gcflags, env = get_build_flags(ctx, arch=arch, major_version=major_version, python_runtimes='3', agent_flavor="security_agent")
 
 
     # TODO use pkg/version for this

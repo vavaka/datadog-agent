@@ -60,10 +60,11 @@ var (
 
 //Values for AgentFlavor below
 const (
-	DefaultAgentFlavor = "agent"
-	IotAgentFlavor     = "iot_agent"
-	ClusterAgentFlavor = "cluster_agent"
-	DogstatsdFlavor    = "dogstatsd"
+	DefaultAgentFlavor  = "agent"
+	IotAgentFlavor      = "iot_agent"
+	ClusterAgentFlavor  = "cluster_agent"
+	SecurityAgentFlavor = "security_agent"
+	DogstatsdFlavor     = "dogstatsd"
 )
 
 // Variables to initialize at build time
