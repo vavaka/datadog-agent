@@ -252,10 +252,9 @@ func obfuscateSQL(rawQuery *C.char, errResult **C.char) *C.char {
 
 //export obfuscateSQLExecPlan
 func obfuscateSQLExecPlan(rawQuery *C.char, normalize C.bool, errResult **C.char) *C.char {
-	shouldNormalize := normalize == C.bool(true)
 	switch C.GoString(rawQuery) {
 	case "raw-json-plan":
-		if shouldNormalize {
+		if bool(normalize) {
 			return (*C.char)(helpers.TrackedCString("obfuscated-and-normalized"))
 		} else {
 			// obfuscate only

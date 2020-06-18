@@ -230,7 +230,7 @@ func ObfuscateSQL(rawQuery *C.char, errResult **C.char) *C.char {
 func ObfuscateSQLExecPlan(jsonPlan *C.char, normalize C.bool, errResult **C.char) *C.char {
 	obfuscatedJSONPlan, err := lazyInitObfuscator().ObfuscateSQLExecPlan(
 		C.GoString(jsonPlan),
-		normalize == C.bool(true),
+		bool(normalize),
 	)
 	if err != nil {
 		// memory will be freed by caller
