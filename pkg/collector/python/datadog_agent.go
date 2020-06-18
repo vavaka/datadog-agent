@@ -189,6 +189,9 @@ func ReadPersistentCache(key *C.char) *C.char {
 }
 
 var (
+	// one obfuscator instance is shared across all python checks. It is not threadsafe but that is ok because
+	// the GIL is always locked when calling c code from python which means that the exported functions in this file
+	// will only ever be called by one goroutine at a time
 	obfuscator       *obfuscate.Obfuscator
 	obfuscatorLoader sync.Once
 )
