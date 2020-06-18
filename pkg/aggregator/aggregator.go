@@ -44,19 +44,6 @@ var (
 	stateError = "error"
 )
 
-const (
-	// AgentName is the default agent name
-	AgentName = "agent"
-	// DogStatsDStandAloneName stand-alone
-	DogStatsDStandAloneName = "dogstatsd"
-	// IotAgentName is the name for an IoT instance of the Agent
-	IotAgentName = "iot_agent"
-	// ClusterAgentName is the Cluster Agent name
-	ClusterAgentName = "cluster_agent"
-	// SecurityAgentName is the Security Agent name
-	SecurityAgentName = "security_agent"
-)
-
 func (s *Stats) add(stat int64) {
 	s.m.Lock()
 	defer s.m.Unlock()
@@ -160,14 +147,14 @@ func init() {
 }
 
 // InitAggregator returns the Singleton instance
-func InitAggregator(s serializer.MetricSerializer, hostname, agentName string) *BufferedAggregator {
-	return InitAggregatorWithFlushInterval(s, hostname, agentName, DefaultFlushInterval)
+func InitAggregator(s serializer.MetricSerializer, hostname string) *BufferedAggregator {
+	return InitAggregatorWithFlushInterval(s, hostname, DefaultFlushInterval)
 }
 
 // InitAggregatorWithFlushInterval returns the Singleton instance with a configured flush interval
-func InitAggregatorWithFlushInterval(s serializer.MetricSerializer, hostname, agentName string, flushInterval time.Duration) *BufferedAggregator {
+func InitAggregatorWithFlushInterval(s serializer.MetricSerializer, hostname string, flushInterval time.Duration) *BufferedAggregator {
 	aggregatorInit.Do(func() {
-		aggregatorInstance = NewBufferedAggregator(s, hostname, agentName, flushInterval)
+		aggregatorInstance = NewBufferedAggregator(s, hostname, flushInterval)
 		go aggregatorInstance.run()
 	})
 
@@ -220,11 +207,11 @@ type BufferedAggregator struct {
 	TickerChan         <-chan time.Time // For test/benchmark purposes: it allows the flush to be controlled from the outside
 	stopChan           chan struct{}
 	health             *health.Handle
-	agentName          string // Name of the agent for telemetry metrics (agent / cluster-agent)
+	agentName          string // Flavor of the agent for telemetry metrics
 }
 
 // NewBufferedAggregator instantiates a BufferedAggregator
-func NewBufferedAggregator(s serializer.MetricSerializer, hostname, agentName string, flushInterval time.Duration) *BufferedAggregator {
+func NewBufferedAggregator(s serializer.MetricSerializer, hostname string, flushInterval time.Duration) *BufferedAggregator {
 	bufferSize := config.Datadog.GetInt("aggregator_buffer_size")
 
 	aggregator := &BufferedAggregator{
@@ -250,7 +237,7 @@ func NewBufferedAggregator(s serializer.MetricSerializer, hostname, agentName st
 		hostnameUpdateDone: make(chan struct{}),
 		stopChan:           make(chan struct{}),
 		health:             health.RegisterLiveness("aggregator"),
-		agentName:          agentName,
+		agentName:          config.AgentFlavor,
 	}
 
 	return aggregator
