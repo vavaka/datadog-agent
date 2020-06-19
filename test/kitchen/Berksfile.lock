@@ -1,0 +1,50 @@
+DEPENDENCIES
+  apt (< 4.0.0)
+  datadog
+    git: git@github.com:DataDog/chef-datadog.git
+    revision: 405fccc73beb79732b03cfe94e8720f591654090
+  dd-agent-5
+    path: site-cookbooks/dd-agent-5
+  dd-agent-import-conf
+    path: site-cookbooks/dd-agent-import-conf
+  dd-agent-install
+    path: site-cookbooks/dd-agent-install
+  dd-agent-install-script
+    path: site-cookbooks/dd-agent-install-script
+  dd-agent-sles-workaround
+    path: site-cookbooks/dd-agent-sles-workaround
+  dd-agent-step-by-step
+    path: site-cookbooks/dd-agent-step-by-step
+  dd-agent-system-files-check
+    path: site-cookbooks/dd-agent-system-files-check
+  dd-agent-upgrade
+    path: site-cookbooks/dd-agent-upgrade
+
+GRAPH
+  apt (3.0.0)
+  chef_handler (3.0.3)
+  datadog (4.3.0)
+    apt (>= 0.0.0)
+    chef_handler (>= 1.2.0)
+    yum (>= 3.0.0)
+  dd-agent-5 (0.2.0)
+    apt (>= 2.1.0)
+    datadog (>= 0.0.0)
+    yum (>= 0.0.0)
+  dd-agent-import-conf (0.1.0)
+    apt (>= 2.1.0)
+    datadog (>= 0.0.0)
+    yum (>= 0.0.0)
+  dd-agent-install (0.2.0)
+    apt (>= 2.1.0)
+    datadog (>= 0.0.0)
+    yum (>= 0.0.0)
+  dd-agent-install-script (0.2.0)
+  dd-agent-sles-workaround (0.0.1)
+  dd-agent-step-by-step (0.2.0)
+  dd-agent-system-files-check (0.0.1)
+  dd-agent-upgrade (0.2.0)
+    apt (>= 2.1.0)
+    datadog (>= 0.0.0)
+    yum (>= 0.0.0)
+  yum (5.1.0)

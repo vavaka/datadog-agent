@@ -1,3 +1,5 @@
 site :opscode
 
+cookbook 'datadog', git: 'git@github.com:DataDog/chef-datadog.git'
+
 metadata
