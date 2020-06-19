@@ -8,6 +8,7 @@
 package ddandroid
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/config"
 	"github.com/DataDog/datadog-agent/pkg/status"
 	"github.com/DataDog/datadog-agent/pkg/util/androidasset"
+	"github.com/DataDog/datadog-agent/pkg/util/flavor"
 )
 
 func AndroidMain(apikey string, hostname string, tags string) {
@@ -41,7 +43,14 @@ func AndroidMain(apikey string, hostname string, tags string) {
 	config.Datadog.SetConfigFile("datadog.yaml")
 	config.AddOverrides(overrides)
 
-	ddapp.StartAgent()
+	ctx := context.Background()
+	context.WithValue(
+		ctx,
+		flavor.FlavorKey,
+		flavor.DefaultAgentFlavor,
+	)
+
+	ddapp.StartAgent(ctx)
 }
 
 func GetStatus() string {

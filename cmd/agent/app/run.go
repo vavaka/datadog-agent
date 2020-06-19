@@ -38,6 +38,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/status/health"
 	"github.com/DataDog/datadog-agent/pkg/telemetry"
 	"github.com/DataDog/datadog-agent/pkg/util"
+	"github.com/DataDog/datadog-agent/pkg/util/flavor"
 	"github.com/DataDog/datadog-agent/pkg/util/log"
 	"github.com/DataDog/datadog-agent/pkg/version"
 	"github.com/spf13/cobra"
@@ -118,7 +119,8 @@ func run(cmd *cobra.Command, args []string) error {
 		}
 	}()
 
-	if err := StartAgent(); err != nil {
+	ctx := cmd.Context()
+	if err := StartAgent(ctx); err != nil {
 		return err
 	}
 
@@ -129,7 +131,7 @@ func run(cmd *cobra.Command, args []string) error {
 }
 
 // StartAgent Initializes the agent process
-func StartAgent() error {
+func StartAgent(ctx context.Context) error {
 	// Main context passed to components
 	common.MainCtx, common.MainCtxCancel = context.WithCancel(context.Background())
 
@@ -237,9 +239,6 @@ func StartAgent() error {
 		}
 	}
 
-	// is this instance running as an iot agent
-	var iotAgent bool = config.Datadog.GetBool("iot_host")
-
 	// start the GUI server
 	guiPort := config.Datadog.GetString("GUI_port")
 	if guiPort == "-1" {
@@ -258,14 +257,14 @@ func StartAgent() error {
 	common.Forwarder.Start() //nolint:errcheck
 	log.Debugf("Forwarder started")
 
-	agentName := "agent"
-	if iotAgent {
-		agentName = "iot_agent"
+	agentFlavor, ok := ctx.Value(flavor.FlavorKey).(string)
+	if !ok {
+		return fmt.Errorf("Cannot get Agent flavor, exiting")
 	}
 
 	// setup the aggregator
 	s := serializer.NewSerializer(common.Forwarder)
-	agg := aggregator.InitAggregator(s, hostname, agentName)
+	agg := aggregator.InitAggregator(s, hostname, agentFlavor)
 	agg.AddAgentStartupTelemetry(version.AgentVersion)
 
 	// start dogstatsd

@@ -22,7 +22,7 @@ func main() {
 	ctx = context.WithValue(
 		ctx,
 		flavor.FlavorKey,
-		flavor.DefaultAgentFlavor,
+		flavor.IotAgentFlavor,
 	)
 
 	// Invoke the Agent

@@ -29,6 +29,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/status/health"
 	"github.com/DataDog/datadog-agent/pkg/tagger"
 	"github.com/DataDog/datadog-agent/pkg/util"
+	"github.com/DataDog/datadog-agent/pkg/util/flavor"
 	"github.com/DataDog/datadog-agent/pkg/util/log"
 	"github.com/DataDog/datadog-agent/pkg/version"
 )
@@ -203,7 +204,7 @@ func runAgent() (mainCtx context.Context, mainCtxCancel context.CancelFunc, err 
 		tagger.Init()
 	}
 
-	aggregatorInstance := aggregator.InitAggregator(s, hname, aggregator.DogStatsDStandAloneName)
+	aggregatorInstance := aggregator.InitAggregator(s, hname, flavor.DogstatsdFlavor)
 
 	statsd, err = dogstatsd.NewServer(aggregatorInstance)
 	if err != nil {

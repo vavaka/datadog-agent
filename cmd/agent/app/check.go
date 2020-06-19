@@ -32,6 +32,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/serializer"
 	"github.com/DataDog/datadog-agent/pkg/status"
 	"github.com/DataDog/datadog-agent/pkg/util"
+	"github.com/DataDog/datadog-agent/pkg/util/flavor"
 )
 
 var (
@@ -114,17 +115,14 @@ var checkCmd = &cobra.Command{
 			return err
 		}
 
-		// is this instance running as an iot agent
-		var iotAgent bool = config.Datadog.GetBool("iot_host")
-
-		agentName := aggregator.AgentName
-		if iotAgent {
-			agentName = aggregator.IotAgentName
+		agentFlavor, ok := cmd.Context().Value(flavor.FlavorKey).(string)
+		if !ok {
+			return fmt.Errorf("Cannot get Agent flavor, exiting")
 		}
 
 		s := serializer.NewSerializer(common.Forwarder)
 		// Initializing the aggregator with a flush interval of 0 (which disable the flush goroutine)
-		agg := aggregator.InitAggregatorWithFlushInterval(s, hostname, agentName, 0)
+		agg := aggregator.InitAggregatorWithFlushInterval(s, hostname, agentFlavor, 0)
 		common.SetupAutoConfig(config.Datadog.GetString("confd_path"))
 
 		if config.Datadog.GetBool("inventories_enabled") {

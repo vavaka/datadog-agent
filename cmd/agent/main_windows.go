@@ -8,6 +8,7 @@
 package main
 
 import (
+	"context"
 	_ "expvar"
 	"fmt"
 	_ "net/http/pprof"
@@ -18,6 +19,7 @@ import (
 	"github.com/DataDog/datadog-agent/cmd/agent/common"
 	"github.com/DataDog/datadog-agent/cmd/agent/common/signals"
 	"github.com/DataDog/datadog-agent/pkg/config"
+	"github.com/DataDog/datadog-agent/pkg/util/flavor"
 	"github.com/DataDog/datadog-agent/pkg/util/log"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/debug"
@@ -28,6 +30,15 @@ var elog debug.Log
 
 func main() {
 	common.EnableLoggingToFile()
+
+	// ctx is the app context
+	ctx := context.Background()
+	ctx = context.WithValue(
+		ctx,
+		flavor.FlavorKey,
+		flavor.DefaultAgentFlavor,
+	)
+
 	// if command line arguments are supplied, even in a non interactive session,
 	// then just execute that.  Used when the service is executing the executable,
 	// for instance to trigger a restart.
@@ -38,20 +49,22 @@ func main() {
 		}
 		if !isIntSess {
 			common.EnableLoggingToFile()
-			runService(false)
+			runService(ctx, false)
 			return
 		}
 	}
 	defer log.Flush()
 
 	// Invoke the Agent
-	if err := app.AgentCmd.Execute(); err != nil {
+	if err := app.AgentCmd.ExecuteContext(ctx); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
 }
 
-type myservice struct{}
+type myservice struct {
+	context context.Context
+}
 
 func (m *myservice) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
 	const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown
@@ -65,7 +78,7 @@ func (m *myservice) Execute(args []string, r <-chan svc.ChangeRequest, changes c
 		elog.Warning(0x80000002, err.Error())
 		// continue running with what we have.
 	}
-	if err := app.StartAgent(); err != nil {
+	if err := app.StartAgent(m.context); err != nil {
 		log.Errorf("Failed to start agent %v", err)
 		elog.Error(0xc000000B, err.Error())
 		errno = 1 // indicates non-successful return from handler.
@@ -110,7 +123,7 @@ loop:
 	return
 }
 
-func runService(isDebug bool) {
+func runService(ctx context.Context, isDebug bool) {
 	var err error
 	if isDebug {
 		elog = debug.New(config.ServiceName)
@@ -125,7 +138,7 @@ func runService(isDebug bool) {
 	elog.Info(0x40000007, config.ServiceName)
 	run := svc.Run
 
-	err = run(config.ServiceName, &myservice{})
+	err = run(config.ServiceName, &myservice{context: ctx})
 	if err != nil {
 		elog.Error(0xc0000008, err.Error())
 		return
