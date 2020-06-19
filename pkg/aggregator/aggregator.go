@@ -14,6 +14,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/serializer/split"
 	"github.com/DataDog/datadog-agent/pkg/telemetry"
 	"github.com/DataDog/datadog-agent/pkg/util"
+	"github.com/DataDog/datadog-agent/pkg/util/flavor"
 	"github.com/DataDog/datadog-agent/pkg/util/log"
 	"github.com/DataDog/datadog-agent/pkg/version"
 
@@ -237,7 +238,7 @@ func NewBufferedAggregator(s serializer.MetricSerializer, hostname string, flush
 		hostnameUpdateDone: make(chan struct{}),
 		stopChan:           make(chan struct{}),
 		health:             health.RegisterLiveness("aggregator"),
-		agentName:          config.AgentFlavor,
+		agentName:          flavor.AgentFlavor,
 	}
 
 	return aggregator
